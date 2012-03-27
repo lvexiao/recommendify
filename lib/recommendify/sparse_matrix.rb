@@ -19,6 +19,14 @@ class Recommendify::SparseMatrix
   def incr(x,y)
     k_incr(key(x,y))
   end
+  
+  def decr(x,y)
+    k_decr(key(x,y))
+  end
+  
+  def del(x,y)
+    k_del(key(x,y)) if k_get(key(x,y)) <= 0
+  end
 
 private
 
@@ -40,6 +48,10 @@ private
 
   def k_incr(key)
     Recommendify.redis.hincrby(redis_key, key, 1)
+  end
+  
+  def k_decr(key)
+    Recommendify.redis.hincrby(redis_key, key, -1)
   end
 
   # OPTIMIZE: use scripting/lua in redis 2.6

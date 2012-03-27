@@ -24,6 +24,14 @@ module Recommendify::CCMatrix
       ccmatrix.incr(item_id, other_item)
     end
   end
+  
+  def cut_single(set_id, item_id, other_item_ids)
+    item_count_decr(item_id)
+    other_item_ids.each do |other_item|
+      ccmatrix.decr(item_id, other_item)
+      ccmatrix.del(item_id,other_item)
+    end
+  end
 
   def all_items
     Recommendify.redis.hkeys(redis_key(:items))
@@ -42,6 +50,13 @@ private
 
   def item_count_incr(key)
     Recommendify.redis.hincrby(redis_key(:items), key, 1)
+  end
+  
+  def item_count_decr(key)
+    Recommendify.redis.hincrby(redis_key(:items), key, -1)
+    if Recommendify.redis.hget(redis_key(:items), key).to_i <= 0
+      Recommendify.redis.hdel(redis_key(:items), key)
+    end
   end
 
   def item_count(key)
