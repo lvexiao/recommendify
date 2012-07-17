@@ -99,7 +99,7 @@ int main(int argc, char **argv){
 
   freeReplyObject(reply);
 
-  if(itemCount < 2){
+  if(itemCount < 1){
     printf("exit: item count is zero or one\n");
     return 0;
   }
