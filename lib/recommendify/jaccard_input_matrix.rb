@@ -34,8 +34,15 @@ private
   end
 
   def run_native(item_id)
-    res = %x{#{native_path} --jaccard "#{redis_key}" "#{item_id}" "#{redis_url}"}
-    raise "error: dirty exit (#{$?})" if $? != 0
+    res = nil
+    begin
+      res = %x{#{native_path} --jaccard "#{redis_key}" "#{item_id}" "#{redis_url}"}
+      raise "error: dirty exit (#{$?})" if $? != 0
+    rescue => e
+      sleep 1
+      puts "Retry to connect to redis-server..."
+      retry
+    end
     res.split("\n").map do |line|
       sim = line.match(/OUT: \(([^\)]*)\) \(([^\)]*)\)/)
       unless sim
